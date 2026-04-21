@@ -1,4 +1,3 @@
-/* SPDX-License-Identifier: 0BSD */
 /*
  * clear - reset cursor, erase screen, clear scrollback (ANSI).
  */
