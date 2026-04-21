@@ -22,7 +22,7 @@ STD     = -std=c11
 CFLAGS  ?= $(STD) $(SIZE) $(WARN) $(HARDEN)
 LDFLAGS ?= --static -Wl,-z,noexecstack -Wl,--gc-sections
 
-.PHONY: all clean install
+.PHONY: all clean install smoke
 
 all: $(BIN)
 
@@ -45,3 +45,7 @@ install: $(BIN)
 	for n in $(APPLETS); do \
 	  ln -sf $(BIN) $(DESTDIR)$(BINDIR)/$$n; \
 	done
+
+# smoke: run the POSIX-sh smoke tests against the freshly built binary.
+smoke: $(BIN)
+	BIN=$(abspath $(BIN)) sh tests/smoke.sh
