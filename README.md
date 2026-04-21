@@ -46,3 +46,7 @@ at a time.
 3. Add `<name>` to `APPLETS` in the `Makefile`.
 
 Keep it short. Bounded buffers. No recursion in parsers.
+
+## License
+
+[BSD Zero Clause License (0BSD)](LICENSE). SPDX: `0BSD`.
