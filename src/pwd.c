@@ -1,4 +1,3 @@
-/* SPDX-License-Identifier: 0BSD */
 /*
  * pwd - print current working directory.
  *
