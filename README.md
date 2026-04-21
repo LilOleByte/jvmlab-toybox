@@ -1,7 +1,5 @@
 # jvmlab-build
 
-**Repository:** [github.com/LilOleByte/jvmlab-build](https://github.com/LilOleByte/jvmlab-build)
-
 **[JVMLAB.org](https://jvmlab.org/)** — a single-script pipeline that builds a tiny, bootable live Linux ISO (kernel, userspace, ISOLINUX). This tree is `minimal.sh`, `clean.sh`, and related tooling.
 
 **Userspace** comes from **[jvmlab-toybox](https://github.com/LilOleByte/jvmlab-toybox)** — a separate repository. `minimal.sh` clones it at build time; use `JVMLAB_TOYBOX_URL` and `JVMLAB_TOYBOX_REF` to override. A `jvmlab-toybox/` directory here is only for local development (vendor or symlink).
