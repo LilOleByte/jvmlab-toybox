@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 /*
  * mount - minimal mount(2) wrapper.
  *

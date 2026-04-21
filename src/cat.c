@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 /*
  * cat - concatenate files (or stdin) to stdout.
  *

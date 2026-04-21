@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 /*
  * ls - one name per line, optional -a. No sorting, no columns, no -l.
  *

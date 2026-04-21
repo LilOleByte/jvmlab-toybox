@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: 0BSD */
 /*
  * sh - very small interactive shell for JVMLAB minimal live.
  *
