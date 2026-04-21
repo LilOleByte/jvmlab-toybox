@@ -1,4 +1,3 @@
-/* SPDX-License-Identifier: 0BSD */
 /*
  * common.h - shared helpers for jvmlab-toybox.
  *
