@@ -8,7 +8,7 @@ Built for JVMLAB minimal Linux; not a Toybox or BusyBox replacement.
 | Applet  | What it does                                |
 |---------|---------------------------------------------|
 | `sh`    | Small interactive shell.                    |
-| `ls`    | List a directory (`-a` for dotfiles).       |
+| `ls`    | List directories (POSIX-oriented: `-a`/`-A`, `-l`/`-n`, `-F`/`-p`, `-R`, sort, etc.). |
 | `clear` | Clear the terminal.                         |
 | `cat`   | Print files (or stdin) to stdout.           |
 | `echo`  | Print arguments (`-n` to skip the newline). |
@@ -19,8 +19,9 @@ Built for JVMLAB minimal Linux; not a Toybox or BusyBox replacement.
 
     make
 
-Hardened by default: `-Os`, stack protector, `_FORTIFY_SOURCE=2`, `--static`,
-no-exec stack, dead-code stripping.
+The Makefile sets **`CC := musl-gcc`** (install the `musl` package on Arch). Use
+`make CC=cc` for glibc. Hardened by default: `-Os`, stack protector,
+`_FORTIFY_SOURCE=2`, `--static`, no-exec stack, dead-code stripping.
 
 ## Install
 
@@ -49,4 +50,4 @@ Keep it short. Bounded buffers. No recursion in parsers.
 
 ## License
 
-[BSD Zero Clause License (0BSD)](LICENSE). SPDX: `0BSD`.
+[BSD Zero Clause License (0BSD)](LICENSE).
