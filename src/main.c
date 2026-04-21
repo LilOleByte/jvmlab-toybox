@@ -11,7 +11,7 @@
 
 const struct jtb_cmd jtb_cmds[] = {
 	{ "sh",    jtb_main_sh,    "sh [-c CMD]"         },
-	{ "ls",    jtb_main_ls,    "ls [-a] [PATH...]"   },
+	{ "ls",    jtb_main_ls,    "ls [POSIX opts] [PATH...]" },
 	{ "clear", jtb_main_clear, "clear"               },
 	{ "cat",   jtb_main_cat,   "cat [FILE...]"       },
 	{ "echo",  jtb_main_echo,  "echo [-n] [STR...]"  },
