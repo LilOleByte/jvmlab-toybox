@@ -1,9 +1,10 @@
 # jvmlab-toybox: hardened static multicall binary for JVMLAB minimal Linux.
 #
-# No external deps beyond a C toolchain. Statically linked. Override CC /
+# Default toolchain: musl (musl-gcc). Override CC=cc for glibc, or set
 # CFLAGS / LDFLAGS from the environment if needed (minimal.sh does).
 
-CC      ?= cc
+# := so a shell-exported CC=cc does not silently override this default.
+CC      := musl-gcc
 BIN      = jvmlab-toybox
 
 SRCS = src/main.c src/common.c \
