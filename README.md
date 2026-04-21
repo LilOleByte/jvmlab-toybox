@@ -1,87 +1,52 @@
-# jvmlab-build
+# jvmlab-toybox
 
-**[JVMLAB.org](https://jvmlab.org/)** — a single-script pipeline that builds a tiny, bootable live Linux ISO (kernel, userspace, ISOLINUX). This tree is `minimal.sh`, `clean.sh`, and related tooling.
+A tiny static multicall binary. One file per tool, one entry in a table.
+Built for JVMLAB minimal Linux; not a Toybox or BusyBox replacement.
 
-**Userspace** comes from **[jvmlab-toybox](https://github.com/LilOleByte/jvmlab-toybox)** — a separate repository. `minimal.sh` clones it at build time; use `JVMLAB_TOYBOX_URL` and `JVMLAB_TOYBOX_REF` to override. A `jvmlab-toybox/` directory here is only for local development (vendor or symlink).
+## Applets
 
-## What the build does
-
-`minimal.sh` fetches, builds, and assembles:
-
-| Component | Source |
-|-----------|--------|
-| **Linux** | Longterm 6.18.x from kernel.org |
-| **jvmlab-toybox** | Cloned from [LilOleByte/jvmlab-toybox](https://github.com/LilOleByte/jvmlab-toybox) |
-| **Syslinux** | 6.03 (stable upstream) |
-
-## Userspace: jvmlab-toybox
-
-The live ISO ships one **static binary** at `/bin/jvmlab-toybox`, with symlinks per applet:
-
-- **`sh`** — minimal shell (quoting, `cd`, `exit`, `$?`, external exec)
-- **`ls`**, **`clear`**, **`cat`**, **`echo`**, **`pwd`**, **`mount`**
-
-Why a custom multicall instead of upstream Toybox:
-
-- **Smaller TCB** — only shipped applets; no bundled POSIX surface, setuid, or networking tools.
-- **Simple dispatcher** — `main()` maps `basename(argv[0])` to a fixed table; no `setjmp`/`longjmp` or mutable global state that nested shells can corrupt.
-- **Easy to review** — one short C file per applet; add a source file and one table entry.
-
-Details: [jvmlab-toybox README](https://github.com/LilOleByte/jvmlab-toybox/blob/main/README.md) (or `jvmlab-toybox/README.md` after clone / local checkout).
-
-## Requirements
-
-On Ubuntu or Linux Mint:
-
-    sudo apt install wget git make gcc bc bison flex xorriso libelf-dev libssl-dev python3 cpio musl-tools
-
-`musl-tools` supplies `musl-gcc` for static **jvmlab-toybox**. On Arch, install `musl`.
-
-The build does **not** require root.
+| Applet  | What it does                                |
+|---------|---------------------------------------------|
+| `sh`    | Small interactive shell.                    |
+| `ls`    | List directories (POSIX-oriented: `-a`/`-A`, `-l`/`-n`, `-F`/`-p`, `-R`, sort, etc.). |
+| `clear` | Clear the terminal.                         |
+| `cat`   | Print files (or stdin) to stdout.           |
+| `echo`  | Print arguments (`-n` to skip the newline). |
+| `pwd`   | Print the current directory.                |
+| `mount` | Call `mount(2)`, or dump `/proc/mounts`.    |
 
 ## Build
 
-Clone and run:
+    make
 
-    git clone https://github.com/LilOleByte/jvmlab-build.git
-    cd jvmlab-build
-    ./minimal.sh
+The Makefile sets **`CC := musl-gcc`** (install the `musl` package on Arch). Use
+`make CC=cc` for glibc. Hardened by default: `-Os`, stack protector,
+`_FORTIFY_SOURCE=2`, `--static`, no-exec stack, dead-code stripping.
 
-Output: **`minimal.iso`** in the project directory.
+## Install
 
-### Run in QEMU
+    make install DESTDIR=/tmp/rootfs BINDIR=/bin
 
-    qemu-system-x86_64 -m 512 -cdrom minimal.iso -boot d
+Installs the binary and a symlink per applet.
 
-The image is intentionally minimal; the kernel may include a network stack, but nothing in userspace brings interfaces up.
+## Shell (v1)
 
-## `minimal.sh` options (environment variables)
+- Quoting: `'...'`, `"..."`, `\x`.
+- Comments: `#` to end of line.
+- Builtins: `cd`, `exit`, and every applet above.
+- External commands via `fork` + `execvp`.
+- Only variable: `$?` (last exit status).
 
-Optional. Example: `VAR=value ./minimal.sh`.
+Not here yet: pipes, redirection, globbing, `$VAR`, job control. Add them one
+at a time.
 
-| Variable | Purpose |
-|----------|---------|
-| `JOBS` | Parallel `make` jobs. Default: all CPUs (`nproc` / `getconf _NPROCESSORS_ONLN`, else 4). Example: `JOBS=8 ./minimal.sh`. |
-| `KERNEL_NO_NETWORK` | `1`, `y`, `yes`, or `true` (case-insensitive for the last three) builds the kernel **without** `CONFIG_NET` (smaller `bzImage`). Uses the kernel’s `scripts/config` after `defconfig` (needs Python 3). Example: `KERNEL_NO_NETWORK=1 ./minimal.sh`. |
-| `JVMLAB_CC` | Compiler for **jvmlab-toybox only** (default `musl-gcc`). The kernel still uses your normal `gcc`. Example: `JVMLAB_CC=cc ./minimal.sh` for glibc userspace. |
-| `JVMLAB_TOYBOX_URL` | Git URL for jvmlab-toybox. Default: `https://github.com/LilOleByte/jvmlab-toybox.git`. |
-| `JVMLAB_TOYBOX_REF` | Branch or tag to clone. Default: `main`. Pin for reproducible builds, e.g. `JVMLAB_TOYBOX_REF=v0.1.0 ./minimal.sh`. |
+## Add an applet
 
-jvmlab-toybox sets its own hardening in its `Makefile`; adjust `CFLAGS` / `LDFLAGS` there if needed.
+1. Write `src/<name>.c` with `int jtb_main_<name>(int, char **)`.
+2. Declare it in `src/common.h` and add a row to `jtb_cmds[]` in `src/main.c`.
+3. Add `<name>` to `APPLETS` in the `Makefile`.
 
-The script sets `MAKEFLAGS=-j$JOBS` so jvmlab-toybox, the kernel, and other `make` steps share the same parallelism.
-
-## Cleaning
-
-`./clean.sh` removes extracted sources, the cloned `jvmlab-toybox-src/` tree, generated rootfs, `isoimage/`, and the ISO (paths are relative to the script directory).
-
-| Variable | Purpose |
-|----------|---------|
-| `KEEP_DOWNLOADS` | If `1`, keeps downloaded tarballs (`kernel.tar.xz`, `syslinux.tar.xz`) and only removes extracted dirs, the clone, `rootfs/`, `isoimage/`, and `*.iso`. Otherwise full clean. Example: `KEEP_DOWNLOADS=1 ./clean.sh`. |
-
-## JVMLAB
-
-Documentation and releases: **[https://jvmlab.org/](https://jvmlab.org/)**.
+Keep it short. Bounded buffers. No recursion in parsers.
 
 ## License
 
