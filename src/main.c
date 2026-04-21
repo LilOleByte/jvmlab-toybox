@@ -1,4 +1,3 @@
-/* SPDX-License-Identifier: 0BSD */
 /*
  * main.c - jvmlab-toybox multicall dispatcher.
  *
