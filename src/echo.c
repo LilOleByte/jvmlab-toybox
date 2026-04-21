@@ -1,4 +1,3 @@
-/* SPDX-License-Identifier: 0BSD */
 /*
  * echo - print arguments separated by single spaces, newline unless -n.
  *
