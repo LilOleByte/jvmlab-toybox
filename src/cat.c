@@ -1,11 +1,9 @@
-/* SPDX-License-Identifier: 0BSD */
 /*
  * cat - concatenate files (or stdin) to stdout.
  *
  * Uses fixed-size I/O buffer, no line buffering, no seek.
  */
 #include "common.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
